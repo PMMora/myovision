@@ -1,0 +1,4 @@
+You will need to pip install InfusionSoft-API library
+Once you have installed that lib you will need to edit the library.py file at the following places:
+Line 1: "xmlrpc.client"  instead of "xmlrpclib"
+line 15: "except self.client.error as v:" instead of "except self.client.error, v:"
