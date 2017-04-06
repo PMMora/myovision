@@ -3,34 +3,25 @@
 import  shutil, os, re, sys
 from os.path import basename
 
-userhome = os.path.expanduser('~')
-desktop = userhome + r'\Desktop\\'
-srcPath = os.path.dirname(os.path.abspath(__name__))+'\\'
-destPath = desktop + r'\CheckIns\\'
-
-#srcPath = sys.argv[1]
-#destPath = sys.argv[2]+"\\"
-
-
-
 def CheckDestFolder(destPath):
     if not os.path.exists(destPath):
         os.makedirs(destPath)
 
-def Write(text):
-    file.write(text)
+def Write(text, txtfile):
+    txtfile.write(text)
 
-def getSN(path, fileName):
+def getSN(path, fileName,srcPath, destPath, txtfile):
     lstSerialNumber = []  
     SNinFileName = basename(path[-16:-4]).strip("( )")
-    #print(SNinFileName)
+
     #I think this is good, we may need to go further in the future.
     #Get SN from file name and check it's length and contents.
+
     if len(SNinFileName[SNinFileName.index("D"):len(SNinFileName)]) > 9:
-        Write(fileName+"\tUnsuccessful - Naming error - SN too long\n")
+        Write(fileName+"\tUnsuccessful - Naming error - SN too long\n", txtfile)
         return False
     elif re.search('[a-zA-Z]', SNinFileName[SNinFileName.index("D")+1:len(SNinFileName)]):
-        Write(fileName+"\tUnsuccessful - Naming error - SN has letters\n")
+        Write(fileName+"\tUnsuccessful - Naming error - SN has letters\n", txtfile)
         return False
     else:
         lstSerialNumber.append(SNinFileName[SNinFileName.index("D")])
@@ -42,7 +33,7 @@ def getSN(path, fileName):
         if SerialLen == 7 or SerialLen == 8:
             return SerialNumber
         else:
-            Write(fileName+"\tUnsuccessful - Problem with SN in file name\n")
+            Write(fileName+"\tUnsuccessful - Problem with SN in file name\n", txtfile)
             return False
 
 def ensure_dir(file_path):
@@ -53,32 +44,42 @@ def ensure_dir(file_path):
         os.makedirs(directory)
         print(directory +" created")
 
-def MoveFile(path, fileName):
-    SerialNumber = getSN(path, fileName)
+def MoveFile(path, fileName,srcPath, destPath, txtfile):
+    SerialNumber = getSN(path, fileName,srcPath, destPath txtfile)
     if SerialNumber:
         ensure_dir(destPath+SerialNumber)
         print(destPath+SerialNumber+"\\"+fileName)
         if os.path.isfile(destPath+SerialNumber+"\\"+fileName):            
-            Write(fileName+"\tUnsuccessful - File already exists\n")
+            Write(fileName+"\tUnsuccessful - File already exists\n", txtfile)
         else:
             shutil.move(path,destPath+SerialNumber)
-            Write(fileName + "\tSuccessful - File moved\n")
+            Write(fileName + "\tSuccessful - File moved\n", txtfile)
 
 
-def Walk_Through_Files():
+def Walk_Through_Files(txtfile, srcPath, destPath):
     for root, dir, files in os.walk(srcPath):
         for file in files:
             if file.endswith('.pdf'):
                 filePath = os.path.join(root, file)
-                MoveFile(filePath, file)
+                MoveFile(filePath, file,srcPath, destPath, txtfile)
                 print("Moved " +file)
 
 '''def Remove_Empty_Dir():
     for root, dir, files in os.walk(srcPath):
         os.rmdir(os.path.join(root,name))'''
 
+def main():
+    userhome = os.path.expanduser('~')
+    desktop = userhome + r'\Desktop\\'
+    srcPath = os.path.dirname(os.path.abspath(__name__))+'\\'
+    destPath = desktop + r'\CheckIns\\'
+
+    #srcPath = sys.argv[1]
+    #destPath = sys.argv[2]+"\\"
+
+    with open('log.txt','w') as txtfile:
+        CheckDestFolder(destPath)
+        Walk_Through_Files(txtfile, srcPath, destPath)
+        
 if __name__ == "__main__":
-    file = open('log.txt','w')
-    CheckDestFolder(destPath)
-    Walk_Through_Files()
-    file.close()
+    sys.exit(main())
