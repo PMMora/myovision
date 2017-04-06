@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 import  shutil, os, re, sys
 from os.path import basename
 
@@ -6,8 +8,10 @@ desktop = userhome + r'\Desktop\\'
 srcPath = os.path.dirname(os.path.abspath(__name__))+'\\'
 destPath = desktop + r'\CheckIns\\'
 
-newsrcPath = sys.argv[1]
-newdestPath = sys.argv[2]
+#srcPath = sys.argv[1]
+#destPath = sys.argv[2]+"\\"
+
+
 
 def CheckDestFolder(destPath):
     if not os.path.exists(destPath):
@@ -18,13 +22,14 @@ def Write(text):
 
 def getSN(path, fileName):
     lstSerialNumber = []  
-    SNinFileName = basename(path[-13:-4]).strip("( )")
+    SNinFileName = basename(path[-16:-4]).strip("( )")
+    #print(SNinFileName)
     #I think this is good, we may need to go further in the future.
     #Get SN from file name and check it's length and contents.
     if len(SNinFileName[SNinFileName.index("D"):len(SNinFileName)]) > 9:
         Write(fileName+"\tUnsuccessful - Naming error - SN too long\n")
         return False
-    elif re.search('[a-zA-Z]', SNinFileName[SNinFileName.index("D"):len(SNinFileName)]):
+    elif re.search('[a-zA-Z]', SNinFileName[SNinFileName.index("D")+1:len(SNinFileName)]):
         Write(fileName+"\tUnsuccessful - Naming error - SN has letters\n")
         return False
     else:
@@ -66,6 +71,7 @@ def Walk_Through_Files():
             if file.endswith('.pdf'):
                 filePath = os.path.join(root, file)
                 MoveFile(filePath, file)
+                print("Moved " +file)
 
 '''def Remove_Empty_Dir():
     for root, dir, files in os.walk(srcPath):
