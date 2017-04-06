@@ -10,7 +10,7 @@ def CheckDestFolder(destPath):
 def Write(text, txtfile):
     txtfile.write(text)
 
-def getSN(path, fileName,srcPath, destPath, txtfile):
+def getSN(path, fileName, srcPath, destPath, txtfile):
     lstSerialNumber = []  
     SNinFileName = basename(path[-16:-4]).strip("( )")
 
@@ -44,8 +44,8 @@ def ensure_dir(file_path):
         os.makedirs(directory)
         print(directory +" created")
 
-def MoveFile(path, fileName,srcPath, destPath, txtfile):
-    SerialNumber = getSN(path, fileName,srcPath, destPath txtfile)
+def MoveFile(path, fileName, srcPath, destPath, txtfile):
+    SerialNumber = getSN(path, fileName, srcPath, destPath, txtfile)
     if SerialNumber:
         ensure_dir(destPath+SerialNumber)
         print(destPath+SerialNumber+"\\"+fileName)
@@ -56,12 +56,14 @@ def MoveFile(path, fileName,srcPath, destPath, txtfile):
             Write(fileName + "\tSuccessful - File moved\n", txtfile)
 
 
-def Walk_Through_Files(txtfile, srcPath, destPath):
+def Walk_Through_Files(srcPath, destPath, txtfile):
+    print("made it here")
     for root, dir, files in os.walk(srcPath):
         for file in files:
+            print(file)
             if file.endswith('.pdf'):
                 filePath = os.path.join(root, file)
-                MoveFile(filePath, file,srcPath, destPath, txtfile)
+                MoveFile(filePath, file, srcPath, destPath, txtfile)
                 print("Moved " +file)
 
 '''def Remove_Empty_Dir():
@@ -73,13 +75,13 @@ def main():
     desktop = userhome + r'\Desktop\\'
     srcPath = os.path.dirname(os.path.abspath(__name__))+'\\'
     destPath = desktop + r'\CheckIns\\'
+    print(srcPath)
 
     #srcPath = sys.argv[1]
     #destPath = sys.argv[2]+"\\"
-
     with open('log.txt','w') as txtfile:
         CheckDestFolder(destPath)
-        Walk_Through_Files(txtfile, srcPath, destPath)
+        Walk_Through_Files(srcPath, destPath, txtfile)
         
 if __name__ == "__main__":
-    sys.exit(main())
+    main()
