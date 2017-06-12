@@ -14,12 +14,12 @@ def getSN(path, fileName, srcPath, destPath, txtfile):
     check_d11 = re.compile('D11\d{6}[^a-zA-Z\d]')
     check_others = re.compile('D\d{7}[^a-zA-z\d]')
     if check_d11.search(fileName) != None:
-    	return serialNumber.search(fileName).group(0)
+    	return serialNumber.search(fileName).group(0)[:-1]
     elif check_others.search(fileName) != None:
-    	return check_others.search(fileName).group(0)
+    	return check_others.search(fileName).group(0)[:-1]
     else:
     	Write(fileName+'\tUnsuccessful - Unable to find Serial Number\n', txtfile)
-    	print('Did not move ' + fileName)
+    	print('Did not move ' +fileName)
     	return False
 
 def ensure_dir(file_path):
@@ -45,13 +45,9 @@ def MoveFile(path, fileName, srcPath, destPath, txtfile):
 def Walk_Through_Files(srcPath, destPath, txtfile):
     for root, dir, files in os.walk(srcPath):
         for file in files:
-            if file.endswith('.pdf'):
+            if (file.endswith('.pdf') or file.endswith('.doc')):
                 filePath = os.path.join(root, file)
                 MoveFile(filePath, file, srcPath, destPath, txtfile)
-
-'''def Remove_Empty_Dir(srcPath):
-    for root, dir, files in os.walk(srcPath):
-        os.rmdir(os.path.join(root,name))'''
 
 def main():
     userhome = os.path.expanduser('~')
